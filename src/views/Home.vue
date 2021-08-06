@@ -1,9 +1,7 @@
 <template>
   <AddTask v-if="showAddTask" @add-task="addTask" />
 
-  <Tasks
-    :tasks="$store.state.tasks"
-  />
+  <Tasks :tasks="$store.state.tasks" />
 </template>
 
 <script>
