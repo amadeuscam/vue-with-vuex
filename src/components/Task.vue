@@ -12,20 +12,19 @@
 </template>
 
 <script>
+import { computed } from "@vue/runtime-core";
+import { useStore } from "vuex";
+
 export default {
   name: "Task",
   props: {
     task: Object,
   },
-  methods: {
-    deleteTask(id) {
-      this.$store.state.task_id = id;
-      this.$store.dispatch("delete_task");
-    },
-    toggleReminder(id) {
-      this.$store.state.task_id = id;
-      this.$store.dispatch("toggle_reminder");
-    },
+  setup() {
+    const store = useStore();
+    const deleteTask = (id) => {store.commit('delete_task',id)};
+    const toggleReminder = (id) => {store.dispatch('toggleReminder',id)};
+    return { deleteTask, toggleReminder };
   },
 };
 </script>

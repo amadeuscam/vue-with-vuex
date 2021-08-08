@@ -1,6 +1,6 @@
 <template>
   <div v-for="task in tasks" :key="task.id">
-    <Task  :task="task" />
+    <Task :task="task" />
   </div>
 </template>
 

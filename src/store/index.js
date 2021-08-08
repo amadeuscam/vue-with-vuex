@@ -6,39 +6,55 @@ import {
 
 export default createStore({
     state: {
-        task_id: null,
         tasks: [],
         task: {}
     },
     mutations: {
-        async deleteTask(state) {
+
+        delete_task(state, payload) {
+            state.tasks = state.tasks.filter((task) => task.id !== payload)
+        },
+        add_tasks(state, payload){
+            state.tasks = payload
+        },
+        fetch_one_task(state, payload){
+            state.task = payload
+        },
+        toggle_task(state, payload){
+            
+            state.tasks = state.tasks.map((task) =>
+                task.id == payload.id ? {
+                    ...task,
+                    reminder: payload.reminder
+                } : task
+            );
+        },
+        add_task(state, payload){
+            state.tasks = [...state.tasks, payload];
+        },
+
+    },
+    actions: {
+        async deleteTask({
+            commit,
+            state
+        }) {
             if (confirm("Estas seguro¿?")) {
                 const res = await fetch(`api/tasks/${state.task_id}`, {
                     method: "DELETE",
                 });
-
-                res.status === 200 ?
-                    (state.tasks = this.state.tasks.filter((task) => task.id !== state.task_id)) :
-                    alert("algo va mal");
+                res.status === 200 ? commit('delete_task', state.task_id) : alert("algo va mal");
             }
         },
-        async toggleReminder(state) {
+        async toggleReminder({dispatch,
+            commit,state
+        },id) {
 
-            //get data 
-            const res = await fetch(`api/tasks/${state.task_id}`, {
-                method: "GET",
-            });
-
-            const data = await res.json();
-          
-            const updTask = {
-                ...data,
-                reminder: !data.reminder
-            };
-
-
+            await dispatch('fecthTask',id)
+            const updTask = {...state.task,reminder: !state.task.reminder};
+            
             //change data
-            const res_put = await fetch(`api/tasks/${state.task_id}`, {
+            const res_put = await fetch(`api/tasks/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-type": "application/json",
@@ -47,17 +63,14 @@ export default createStore({
             });
 
             const data_put = await res_put.json();
+            commit('toggle_task',data_put)
 
-            state.tasks = state.tasks.map((task) =>
-                task.id == state.task_id ? {
-                    ...task,
-                    reminder: data_put.reminder
-                } : task
-            );
 
         },
-        async addTask(state) {
-            let task = state.task
+        async addTask({
+            commit
+        },task) {
+           
             const res = await fetch("api/tasks", {
                 method: "POST",
                 headers: {
@@ -67,32 +80,29 @@ export default createStore({
             });
 
             const data = await res.json();
+            commit('add_task',data)
 
-            this.state.tasks = [...this.state.tasks, data];
+          
         },
-        async fecthTasks(state) {
+        async fecthTasks({
+            commit
+        }) {
             const res = await fetch("api/tasks");
             const data = await res.json();
-            state.tasks = data
+            commit("add_tasks",data)
+          
         },
+        async fecthTask({
+            commit
+        },id) {
+            const res = await fetch(`api/tasks/${id}`);
+            const data = await res.json();
+            console.log(data);
+          
+            commit("fetch_one_task",data)
+          
+        },
+
 
     },
-    actions: {
-        get_data_backend(context) {
-            context.commit('fecthTasks')
-        },
-        delete_task(context) {
-            context.commit('deleteTask')
-        },
-        toggle_reminder(context) {
-            context.commit('toggleReminder')
-        },
-        add_tasks(context) {
-            context.commit('addTask')
-        }
-
-    },
-    getters: {
-
-    }
 })

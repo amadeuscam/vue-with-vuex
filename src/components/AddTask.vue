@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
+
 export default {
   name: "AddTask",
   data() {
@@ -32,26 +34,27 @@ export default {
       reminder: false,
     };
   },
+
   methods: {
     onSubmit() {
-        if (!this.text) {
-            alert("please add a task")
-            return
-        }
+    
+      if (!this.text) {
+        alert("please add a task");
+        return;
+      }
 
-        const newTask = {
-            text: this.text,
-            day: this.day,
-            reminder: this.reminder
-        }
-        this.text = ''
-        this.day = ''
-        this.reminder = false
-        
-        //send data
-        this.$store.state.task = newTask;
-        this.$store.dispatch("add_tasks");
+      const newTask = {
+        text: this.text,
+        day: this.day,
+        reminder: this.reminder,
+      };
+      this.text = "";
+      this.day = "";
+      this.reminder = false;
 
+      //send data
+      // store.state.task = newTask;
+      this.$store.dispatch("addTask", newTask);
     },
   },
 };
